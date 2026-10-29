@@ -22,7 +22,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -34,7 +34,7 @@ jobs:
         uses: android-actions/setup-android@v4
 
       - name: Install JavaScript dependencies
-        run: npm ci
+        run: npm ci --include=optional
 
       - name: Run unit tests
         run: npm test
