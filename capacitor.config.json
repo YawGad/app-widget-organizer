@@ -1,6 +1,6 @@
 {
   "appId": "com.organizer.app",
-  "appName": "App Organizer",
+  "appName": "Orbit Launcher",
   "webDir": "dist",
   "server": {
     "androidScheme": "https"
