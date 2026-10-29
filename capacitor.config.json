@@ -1,0 +1,8 @@
+{
+  "appId": "com.organizer.app",
+  "appName": "App Organizer",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  }
+}
