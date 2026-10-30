@@ -57,7 +57,15 @@ class SmartLauncherPlugin : Plugin() {
                 .distinctBy { it.packageName }
                 .map { applicationInfo ->
                     val label = packageManager.getApplicationLabel(applicationInfo).toString()
-                    val icon = cachedIconDataUri(applicationInfo.packageName, applicationInfo.lastUpdateTime) {
+                    val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        packageManager.getPackageInfo(
+                            applicationInfo.packageName,
+                            PackageManager.PackageInfoFlags.of(0),
+                        )
+                    } else {
+                        packageManager.getPackageInfo(applicationInfo.packageName, 0)
+                    }
+                    val icon = cachedIconDataUri(applicationInfo.packageName, packageInfo.lastUpdateTime) {
                         val drawable = packageManager.getApplicationIcon(applicationInfo)
                         val size = 96
                         val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
@@ -115,9 +123,10 @@ class SmartLauncherPlugin : Plugin() {
     @PluginMethod
     fun getDefaultLauncherStatus(call: PluginCall) {
         try {
-            val homeCandidates = ArrayList<android.content.pm.ResolveInfo>()
-            val defaultHome = activity.packageManager.getHomeActivities(homeCandidates)
-            call.resolve(JSObject().put("isDefault", defaultHome?.packageName == context.packageName))
+            val packageManager = activity.packageManager
+            val homeIntent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME)
+            val defaultHome = packageManager.resolveActivity(homeIntent, PackageManager.MATCH_DEFAULT_ONLY)
+            call.resolve(JSObject().put("isDefault", defaultHome?.activityInfo?.packageName == context.packageName))
         } catch (exception: RuntimeException) {
             call.reject("Unable to determine the selected Home app.", exception)
         }
